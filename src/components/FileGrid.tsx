@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {File} from '@/types.ts';
+import React, {useEffect, useState} from 'react';
+import {CloudFile} from '@/types.ts';
 import FileIconFactory from '@/components/FileIconFactory.tsx';
 import {
   DropdownMenu,
@@ -12,68 +12,50 @@ import {Button} from '@/components/ui/button.tsx';
 import {Skeleton} from '@/components/ui/skeleton.tsx';
 import {MoreVertical} from 'lucide-react';
 import FileActionsContent from '@/components/FileActionsContent.tsx';
+import {sortString} from '@/lib/utils.ts';
 
 interface FileGridProps {
-  data: File[];
+  data: CloudFile[];
+  setData: React.Dispatch<React.SetStateAction<CloudFile[]>>;
   loading: boolean;
 }
 
 interface SortingOption {
   name: string;
-  fn: (a: File, b: File) => number;
+  fn: (a: CloudFile, b: CloudFile) => number;
 }
-
-const sortString = (a: string, b: string) => {
-  const extractNumbers = (str: string) => {
-    const matches = str.match(/\d+/g);
-    return matches ? matches.map(Number) : [];
-  };
-
-  const numsA = extractNumbers(a);
-  const numsB = extractNumbers(b);
-
-  for (let i = 0; i < Math.max(numsA.length, numsB.length); i++) {
-    const numA = numsA[i] ?? 0;
-    const numB = numsB[i] ?? 0;
-    if (numA !== numB) {
-      return numA - numB;
-    }
-  }
-
-  return a.localeCompare(b);
-};
 
 const sortings: {
   [key: string]: SortingOption;
 } = {
   nameDesc: {
     name: 'A-Z',
-    fn: (a: File, b: File) => sortString(a.name, b.name)
+    fn: (a: CloudFile, b: CloudFile) => sortString(a.name, b.name)
   },
   nameAsc: {
     name: 'Z-A',
-    fn: (a: File, b: File) => sortString(b.name, a.name)
+    fn: (a: CloudFile, b: CloudFile) => sortString(b.name, a.name)
   },
   sizeAsc: {
     name: 'Smallest Size',
-    fn: (a: File, b: File) => a.size - b.size
+    fn: (a: CloudFile, b: CloudFile) => a.size - b.size
   },
   sizeDesc: {
     name: 'Biggest Size',
-    fn: (a: File, b: File) => b.size - a.size
+    fn: (a: CloudFile, b: CloudFile) => b.size - a.size
   },
   updatedAtAsc: {
     name: 'Last Modified',
-    fn: (a: File, b: File) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+    fn: (a: CloudFile, b: CloudFile) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
   },
   updatedAtDesc: {
     name: 'First Modified',
-    fn: (a: File, b: File) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    fn: (a: CloudFile, b: CloudFile) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   },
 };
 
-const FileGrid = ({data: dataProp, loading}: FileGridProps) => {
-  const generalSorting = (a: File, b: File) => {
+const FileGrid = ({data, setData, loading}: FileGridProps) => {
+  const generalSorting = (a: CloudFile, b: CloudFile) => {
     if (a.type !== b.type)
       return a.type === 'directory' ? -1 : 1;
 
@@ -81,11 +63,11 @@ const FileGrid = ({data: dataProp, loading}: FileGridProps) => {
   };
 
   const [sorting, setSorting] = useState('nameDesc' as keyof typeof sortings);
-  const [data, setData] = useState([...dataProp].sort(generalSorting));
+  const TRUNCATE_SIZE = 20;
 
   useEffect(() => {
     setData([...data].sort(generalSorting));
-  }, [sorting]);
+  }, [sorting, data]);
 
   return (
     <div className="pr-4">
@@ -112,7 +94,7 @@ const FileGrid = ({data: dataProp, loading}: FileGridProps) => {
       {/* GRID FILE LAYOUT */}
       <div className="grid grid-cols-8 gap-2">
         {loading ?
-          Array.from({length: 20}).map((_, index) => (
+          Array.from({length: 32}).map((_, index) => (
             <div key={index}
                  className="border rounded-lg shadow-sm p-4 px-2 flex flex-col justify-center items-center gap-2">
               <Skeleton className="rounded-xl h-[36px] w-1/2"/>
@@ -134,8 +116,9 @@ const FileGrid = ({data: dataProp, loading}: FileGridProps) => {
 
               <FileIconFactory file={file} size={36}/>
 
-              <div>
-                {file.name}
+              <div className="text-center w-24 break-words" title={file.name}>
+                {/*I could use truncate but I needed some logic here to show the file extension*/}
+                {file.name.length > TRUNCATE_SIZE ? file.name.slice(0, TRUNCATE_SIZE - 3) + '... ' + (file.type === "file" ? file.name.substring(file.name.lastIndexOf('.')) : '') : file.name}
               </div>
             </div>
           ))}

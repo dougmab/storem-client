@@ -1,8 +1,8 @@
 import {FileIcon, FolderIcon} from 'lucide-react';
-import {File} from '@/types.ts';
+import {CloudFile} from '@/types.ts';
 
 interface FileIconFactoryProps {
-  file: File;
+  file: CloudFile;
   size?: number;
 }
 

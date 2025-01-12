@@ -1,5 +1,5 @@
 import {ColumnDef} from '@tanstack/react-table';
-import {File} from '@/types.ts';
+import {CloudFile} from '@/types.ts';
 import {formatBytes, formatDate, sortFileBy} from '@/lib/utils.ts';
 import Avatar from '@/components/Avatar.tsx';
 import {MoreHorizontal} from 'lucide-react';
@@ -9,7 +9,7 @@ import {DataTableColumnHeader} from '@/components/tables/DataTableHeader.tsx';
 import FileIconFactory from '@/components/FileIconFactory.tsx';
 import FileActionsContent from '@/components/FileActionsContent.tsx';
 
-const fileColumns: ColumnDef<File>[] = [
+const fileColumns: ColumnDef<CloudFile>[] = [
   {
     accessorKey: 'name',
     header: ({column}) => <DataTableColumnHeader column={column} title="Name"/>,

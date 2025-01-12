@@ -1,6 +1,6 @@
 import {type ClassValue, clsx} from 'clsx';
 import {twMerge} from 'tailwind-merge';
-import {File} from '@/types.ts';
+import {CloudFile} from '@/types.ts';
 import {SortingFn} from '@tanstack/react-table';
 
 export function cn(...inputs: ClassValue[]) {
@@ -28,7 +28,7 @@ export function formatDate(date: string | Date) {
   });
 }
 
-const filesDeleteLater: File[] = Array.from({length: 25}, (_, index) => {
+const filesDeleteLater: CloudFile[] = Array.from({length: 25}, (_, index) => {
   const id = (index + 1).toString();
   const isPrivate = Math.random() > 0.5;
   const isDirectory = Math.random() > 0.7;
@@ -58,7 +58,13 @@ const filesDeleteLater: File[] = Array.from({length: 25}, (_, index) => {
 
 export {filesDeleteLater};
 
-export const sortFileBy = <Key extends keyof File>(key: Key): SortingFn<File> => {
+const collator = new Intl.Collator([], {numeric: true})
+
+export const sortString = (a: string, b: string) => {
+  return collator.compare(a, b);
+};
+
+export const sortFileBy = <Key extends keyof CloudFile>(key: Key): SortingFn<CloudFile> => {
   return (rowA, rowB) => {
 // TODO - Find a way to have access to the column sort direction and make directory always appear first
 
@@ -68,7 +74,7 @@ export const sortFileBy = <Key extends keyof File>(key: Key): SortingFn<File> =>
 
     if (key === 'updatedAt') return new Date(rowA.original.updatedAt).getTime() - new Date(rowB.original.updatedAt).getTime();
     if (typeof rowA.original[key] === 'number' && typeof rowB.original[key] === 'number') return rowA.original[key] - rowB.original[key];
-    if (typeof rowA.original[key] === 'string' && typeof rowB.original[key] === 'string') return rowA.original[key].localeCompare(rowB.original[key]);
+    if (typeof rowA.original[key] === 'string' && typeof rowB.original[key] === 'string') return sortString(rowA.original[key], rowB.original[key]);
 
     return 0;
   };

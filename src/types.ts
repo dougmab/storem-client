@@ -1,4 +1,4 @@
-export interface File {
+export interface CloudFile {
   id: string;
   name: string;
   type: 'file' | 'directory';

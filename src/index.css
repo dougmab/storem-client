@@ -78,3 +78,13 @@
     @apply text-primary;
   }
 }
+
+@layer components {
+  .details-prop h4 {
+    @apply scroll-m-20 font-semibold tracking-tight;
+  }
+
+  .details-prop span {
+    @apply font-light;
+  }
+}

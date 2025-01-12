@@ -25,7 +25,7 @@ const DataTable = <TData, TValue>({columns, data, loading}: DataTableProps<TData
   ]);
 
   const tableData = React.useMemo(
-    () => (loading ? Array(3).fill({}) : data),
+    () => (loading ? Array(10).fill({}) : data),
     [loading, data]
   ) as TData[];
 
